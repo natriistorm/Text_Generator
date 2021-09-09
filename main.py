@@ -6,14 +6,14 @@ import re
 
 
 def tokenization():
-    filename = input()
+    filename = "corpus.txt"
     corpus = open(filename, "r", encoding="utf-8").read()
     tk = WhitespaceTokenizer()
     tokenized_corpus = tk.tokenize(corpus)
     #bigrams_corpus = bigrams(tokenized_corpus)
     trigrams_corpus = trigrams(tokenized_corpus)
     chains = markovChains(trigrams_corpus)
-    sentenceGenerator(chains, trigrams_corpus)
+    sentenceGenerator(trigrams_corpus, chains, tokenized_corpus)
 
 
 def queries(corpus: list, chains: list):
@@ -77,27 +77,32 @@ def markovChains(ngrams: dict):
     return chains
 
 
-def sentenceGenerator(chains: list, tokens: list):
+def sentenceGenerator(trigrams: dict, chains: list, tokens: list):
     sentence_counter = 10
     while sentence_counter > 0:
         brake = False
         sentence = ""
         word_counter = 0
         current_word = random.choice(tokens)
-        while not re.match(r'[A-Z]\S*[^.?!]', current_word):
+        while not re.match(r'[A-Z]\S*[^.?!]', current_word) or trigrams.get(current_word) is None:
             current_word = random.choice(tokens)
         sentence += current_word
         word_counter += 1
-        while not re.match(r'\S*[.?!]$', current_pair[1]):
-            tails = [tail for tail, _ in chains[current_pair]]
-            freq_weights = [weight for _, weight in chains[current_pair]]
-            current_pair = random.choices(tails, weights=freq_weights)
-            current_word = current_pair[0][0]
+        current_tail = random.choice(trigrams[current_word])
+        sentence += " " + current_tail[0] + " " + current_tail[1]
+        word_counter += 2
+        current_three = (current_word, current_tail[0], current_tail[1])
+        while not re.match(r'\S*[.?!]$', current_three[2]):
+            tails = [tail for tail, _ in chains[current_tail]]
+            freq_weights = [weight for _, weight in chains[current_tail]]
+            current_word = random.choices(tails, weights=freq_weights)[0]
             if re.match(r'[A-Z]', current_word):
                 brake = True
                 break
-            sentence += " " + current_pair[0][0] + " " + current_pair[0][1]
+            sentence += " " + current_word
             word_counter += 1
+            current_three = (current_tail[0], current_tail[1], current_word)
+            current_tail = (current_tail[1], current_word)
         if word_counter >= 5 and not brake:
             sentence_counter -= 1
             print(sentence)
