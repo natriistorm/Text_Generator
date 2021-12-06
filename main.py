@@ -1,4 +1,3 @@
-# Write your code here
 from nltk.tokenize import WhitespaceTokenizer
 from collections import defaultdict, Counter
 import random
@@ -10,7 +9,6 @@ def tokenization():
     corpus = open(filename, "r", encoding="utf-8").read()
     tk = WhitespaceTokenizer()
     tokenized_corpus = tk.tokenize(corpus)
-    #bigrams_corpus = bigrams(tokenized_corpus)
     trigrams_corpus = trigrams(tokenized_corpus)
     chains = markovChains(trigrams_corpus)
     sentenceGenerator(trigrams_corpus, chains, tokenized_corpus)
@@ -36,33 +34,6 @@ def trigrams(corpus: list) -> dict:
         trigrams_corpus.setdefault(corpus[i], [])
         trigrams_corpus[corpus[i]].append((corpus[i + 1], corpus[i + 2]))
     return trigrams_corpus
-
-
-'''
-def trigrams(bigrams: dict) -> list:
-    trigram = []
-    for head in bigrams:
-        for tail in bigrams[head]:
-            head_trigram = head + " " + tail
-            if re.match(r'\S*[.?!]$', tail):
-                continue
-            for tail_trigram in bigrams[tail]:
-                trigram.append((head_trigram, tail_trigram))
-    return trigram
-'''
-
-'''
-def markovChains(ngrams: dict):
-    appearances = {}
-    for idx in ngrams:
-        appearances[idx] = Counter(ngrams[idx])
-    chains = {}
-    for head in ngrams:
-        for tail in ngrams[head]:
-            chains.setdefault(head, set())
-            chains[head].add((tail, appearances[head][tail]))
-    return chains
-'''
 
 
 def markovChains(ngrams: dict):
