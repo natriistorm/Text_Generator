@@ -11,7 +11,8 @@ def tokenization():
     tokenized_corpus = tk.tokenize(corpus)
     trigrams_corpus = trigrams(tokenized_corpus)
     chains = markovChains(trigrams_corpus)
-    sentenceGenerator(trigrams_corpus, chains, tokenized_corpus)
+    print(chains)
+    #sentenceGenerator(trigrams_corpus, chains, tokenized_corpus)
 
 
 def queries(corpus: list, chains: list):
@@ -29,12 +30,27 @@ def queries(corpus: list, chains: list):
 def trigrams(corpus: list) -> dict:
     trigrams_corpus = {}
     for i in range(len(corpus) - 2):
-        if re.match(r'\S*[.?!]$', corpus[i]) or re.match(r'\S*[.?!]$', corpus[i + 1]):
+        seq = str()
+        if re.match(r'<s>\S*', corpus[i]):
+            cropped = corpus[i][3:]
+            seq = f"<s> {cropped}"
+            if seq not in trigrams_corpus.keys():
+                trigrams_corpus[seq] = []
+            trigrams_corpus[seq].append(corpus[i + 1])
+        elif re.match(r'\S*</s>$', corpus[i]) or re.match(r'<s>\S*', corpus[i + 2]):
             continue
-        trigrams_corpus.setdefault(corpus[i], [])
-        trigrams_corpus[corpus[i]].append((corpus[i + 1], corpus[i + 2]))
+        elif re.match(r'\S*</s>$', corpus[i + 1]):
+            cropped = corpus[i][:-4]
+            seq = f"{corpus[i]} {cropped}"
+            if seq not in trigrams_corpus.keys():
+                trigrams_corpus[seq] = []
+            trigrams_corpus[seq].append("</s>")
+        else:
+            seq = f"{corpus[i]} {corpus[i + 1]}"
+            if seq not in trigrams_corpus.keys():
+                trigrams_corpus[seq] = []
+            trigrams_corpus[seq].append(corpus[i + 2])
     return trigrams_corpus
-
 
 def markovChains(ngrams: dict):
     appearances = {}
