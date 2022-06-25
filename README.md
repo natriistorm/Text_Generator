@@ -12,3 +12,7 @@ Imogen is waiting for him? - asked lord henry.
 According to your category i must go.
 Eighteen years since prince charming not one of them.
 Oh i can’t bear him when he was not so reckless after all.
+
+
+Тут можно посмотреть слайды презентации с защиты проекта:
+https://github.com/natriistorm/Text_Generator/blob/main/slides.pdf
